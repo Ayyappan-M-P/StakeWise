@@ -38,5 +38,5 @@ An investment services platform built with **Next.js** and styled using **Tailwi
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/investment-website.git
-   cd investment-website
+   git clone https://github.com/Ayyappan-M-P/Investment-Company-web.git
+   cd Investment-Company-web
