@@ -38,7 +38,7 @@ const StockTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const companies = [
-    "AAPL", "GOOGL", "AMZN", "MSFT", "TSLA", "NFLX", "NVDA", "META", "INTC", "ADBE", // Add up to 50+ symbols
+    "AAPL", "GOOGL", "AMZN", "MSFT", "TSLA", "NFLX", "NVDA", "META", "INTC", "ADBE", 
     "AMD", "ORCL", "IBM", "CRM", "PYPL", "CSCO", "UBER", "SQ", "SPOT", "SHOP"
   ];
 

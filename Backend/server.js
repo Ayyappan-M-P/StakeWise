@@ -199,35 +199,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login endpoint
-// app.post('/api/login', (req, res) => {
-//   const { email, password } = req.body;
-
-//   if (!email || !password) {
-//     return res.status(400).json({ message: 'Email and password are required' });
-//   }
-
-//   const query = 'SELECT * FROM users WHERE email = ?';
-//   db.query(query, [email], (err, results) => {
-//     if (err) {
-//       console.error('Error executing query:', err);
-//       return res.status(500).json({ message: 'Server error' });
-//     }
-
-//     if (results.length === 0) {
-//       return res.status(401).json({ message: 'Invalid email or password' });
-//     }
-
-//     const user = results[0];
-
-//     if (password === user.password) {
-//       req.session.user = { id: user.id, email: user.email, name: user.name, avatar: user.avatar || '/default-avatar.png' };
-//       return res.status(200).json({ message: 'Login successful', user: req.session.user });
-//     } else {
-//       return res.status(401).json({ message: 'Invalid email or password' });
-//     }
-//   });
-// });
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
@@ -269,6 +240,59 @@ app.post('/api/logout', (req, res) => {
     res.status(200).json({ message: 'Logout successful' });
   });
 });
+
+app.get('/api/getUser', (req, res) => {
+  if (req.session.user) {
+    return res.status(200).json({ user: req.session.user });
+  } else {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+
+// New payment endpoint
+app.post('/api/payment', async (req, res) => {
+  const { userId, paymentMethod, amount, company, details } = req.body;
+
+  if (!userId || !paymentMethod || !amount || !company) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const query = `
+      INSERT INTO payments (userId, paymentMethod, amount, company, details, paymentDate)
+      VALUES (?, ?, ?, ?, ?, NOW())
+    `;
+
+    db.query(query, [userId, paymentMethod, amount, company, JSON.stringify(details)], (err, result) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).json({ message: 'Error processing payment' });
+      }
+
+      res.status(200).json({ message: 'Payment processed successfully' });
+    });
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Payment history endpoint
+app.get('/api/payments/:userId', (req, res) => {
+  const { userId } = req.params;
+
+  const query = 'SELECT * FROM payments WHERE userId = ?';
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching payments:', err);
+      return res.status(500).json({ message: 'Error fetching payments' });
+    }
+
+    res.status(200).json({ payments: results });
+  });
+});
+
 
 // Test endpoint
 app.get('/api/test', (req, res) => {

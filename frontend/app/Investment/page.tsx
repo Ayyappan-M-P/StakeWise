@@ -1,189 +1,124 @@
 "use client";
 
-import React, { useState } from 'react';
-import { CreditCard, Bank, ChevronRight, Check } from 'lucide-react';
+import axios from 'axios';
+import { useState } from 'react';
 
-// Mock investment companies data
-const investmentCompanies = [
-  { 
-    id: 1, 
-    name: 'Tech Innovations Ltd', 
-    interestRate: 8.5, 
-    sector: 'Technology',
-    logo: '/api/placeholder/50/50'
-  },
-  { 
-    id: 2, 
-    name: 'Green Energy Corp', 
-    interestRate: 7.2, 
-    sector: 'Renewable Energy',
-    logo: '/api/placeholder/50/50'
-  },
-  { 
-    id: 3, 
-    name: 'Financial Giants Inc', 
-    interestRate: 9.1, 
-    sector: 'Finance',
-    logo: '/api/placeholder/50/50'
-  }
-];
+const PaymentPage = () => {
+  const [userId, setUserId] = useState(1); // Replace with logged-in user's ID
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [company, setCompany] = useState('');
+  const [amount, setAmount] = useState('');
+  const [details, setDetails] = useState({}); // Store payment-specific details
 
-const InvestmentPaymentPage = () => {
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [paymentStep, setPaymentStep] = useState('companies');
-  const [formData, setFormData] = useState({
-    accountName: '',
-    bankAccount: '',
-    ifscCode: '',
-    otp: ''
-  });
-
-  const handleCompanySelect = (company) => {
-    setSelectedCompany(company);
-    setPaymentStep('payment');
+  const handlePayment = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/api/payment', {
+        userId,
+        paymentMethod,
+        company,
+        amount,
+        details,
+      });
+      alert(response.data.message);
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      alert('Failed to process payment');
+    }
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleSubmitPayment = (e) => {
-    e.preventDefault();
-    // Simulate payment processing
-    setPaymentStep('success');
-  };
-
-  const renderCompaniesStep = () => (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-center mb-6">Investment Opportunities</h2>
-      {investmentCompanies.map(company => (
-        <div 
-          key={company.id} 
-          onClick={() => handleCompanySelect(company)}
-          className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg hover:bg-gray-100 cursor-pointer transition"
-        >
-          <div className="flex items-center space-x-4">
-            <img 
-              src={company.logo} 
-              alt={`${company.name} logo`} 
-              className="w-12 h-12 rounded-full"
-            />
-            <div>
-              <h3 className="font-semibold">{company.name}</h3>
-              <p className="text-sm text-gray-500">{company.sector}</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-green-600 font-bold">{company.interestRate}%</span>
-            <ChevronRight className="text-gray-400" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderPaymentStep = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center">
-        Payment for {selectedCompany.name}
-      </h2>
-      <form onSubmit={handleSubmitPayment} className="space-y-4">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Account Holder Name</label>
-          <input
-            type="text"
-            name="accountName"
-            value={formData.accountName}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter account holder name"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Bank Account Number</label>
-          <input
-            type="text"
-            name="bankAccount"
-            value={formData.bankAccount}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter bank account number"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">IFSC Code</label>
-          <input
-            type="text"
-            name="ifscCode"
-            value={formData.ifscCode}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter IFSC code"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">OTP</label>
-          <input
-            type="text"
-            name="otp"
-            value={formData.otp}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter OTP"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center space-x-2"
-        >
-          <CreditCard className="mr-2" />
-          Proceed to Payment
-        </button>
-      </form>
-    </div>
-  );
-
-  const renderSuccessStep = () => (
-    <div className="text-center space-y-6 p-8">
-      <div className="flex justify-center mb-4">
-        <div className="bg-green-100 p-4 rounded-full">
-          <Check className="text-green-600 w-16 h-16" />
-        </div>
-      </div>
-      <h2 className="text-2xl font-bold text-green-600">Payment Successful!</h2>
-      <p className="text-gray-600">
-        Your investment in {selectedCompany.name} has been processed.
-      </p>
-      <div className="space-y-2">
-        <p><strong>Amount Invested:</strong> ₹10,000</p>
-        <p><strong>Interest Rate:</strong> {selectedCompany.interestRate}%</p>
-      </div>
-      <button 
-        onClick={() => setPaymentStep('companies')}
-        className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
-      >
-        Back to Investments
-      </button>
-    </div>
-  );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white shadow-xl rounded-xl w-full max-w-md p-6">
-        {paymentStep === 'companies' && renderCompaniesStep()}
-        {paymentStep === 'payment' && renderPaymentStep()}
-        {paymentStep === 'success' && renderSuccessStep()}
+    <div className="p-8">
+      <h2 className="text-2xl font-bold">Make a Payment</h2>
+      <div className="mt-4">
+        <label>Choose a Company</label>
+        <select value={company} onChange={(e) => setCompany(e.target.value)} className="border p-2">
+          <option value="">Select a company</option>
+          {[
+            "AAPL", "GOOGL", "AMZN", "MSFT", "TSLA", "NFLX", "NVDA", "META", "INTC", "ADBE",
+            "AMD", "ORCL", "IBM", "CRM", "PYPL", "CSCO", "UBER", "SQ", "SPOT", "SHOP",
+          ].map((comp) => (
+            <option key={comp} value={comp}>{comp}</option>
+          ))}
+        </select>
       </div>
+
+      <div className="mt-4">
+        <label>Payment Method</label>
+        <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="border p-2">
+          <option value="">Select a method</option>
+          <option value="GPay">GPay</option>
+          <option value="CreditCard">Credit Card</option>
+          <option value="NetBanking">Net Banking</option>
+        </select>
+      </div>
+
+      {/* Add conditionally rendered inputs for payment details */}
+      {paymentMethod === 'GPay' && (
+        <div className="mt-4">
+          <label>Scan QR Code:</label>
+          <img src="/path-to-qr-code.png" alt="QR Code" className="w-32 h-32" />
+        </div>
+      )}
+
+      {paymentMethod === 'CreditCard' && (
+        <div className="mt-4 space-y-2">
+          <input
+            type="text"
+            placeholder="Card Number"
+            className="border p-2 w-full"
+            onChange={(e) => setDetails({ ...details, cardNumber: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Expiry Date (MM/YY)"
+            className="border p-2 w-full"
+            onChange={(e) => setDetails({ ...details, expiryDate: e.target.value })}
+          />
+          <input
+            type="password"
+            placeholder="CVC"
+            className="border p-2 w-full"
+            onChange={(e) => setDetails({ ...details, cvc: e.target.value })}
+          />
+        </div>
+      )}
+
+      {paymentMethod === 'NetBanking' && (
+        <div className="mt-4 space-y-2">
+          <input
+            type="text"
+            placeholder="Bank Name"
+            className="border p-2 w-full"
+            onChange={(e) => setDetails({ ...details, bankName: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Account Number"
+            className="border p-2 w-full"
+            onChange={(e) => setDetails({ ...details, accountNo: e.target.value })}
+          />
+        </div>
+      )}
+
+      <div className="mt-4">
+        <label>Amount</label>
+        <input
+          type="number"
+          placeholder="Enter amount"
+          className="border p-2 w-full"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </div>
+
+      <button
+        onClick={handlePayment}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Pay Now
+      </button>
     </div>
   );
 };
 
-export default InvestmentPaymentPage;
+export default PaymentPage;
