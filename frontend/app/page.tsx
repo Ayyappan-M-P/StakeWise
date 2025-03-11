@@ -29,7 +29,7 @@ import {
   TrendingUp, ChartBar, Shield, Users, Award, 
   ArrowRight, Globe, Briefcase, LineChart
 } from 'lucide-react';
-import Chatbot from '@/Components/Chatbot';
+import Chatbot from '@/Components/InvestmentChatbot';
 
 const marketData: MarketData[] = [
   { symbol: "TECH-F", name: "Technology Fund", price: 156.78, change: 2.34, volume: 1245678 },
